@@ -37,9 +37,15 @@ void ParticleManager::render_particles()
 
 void ParticleManager::add_particles_to_grid()
 {
+	int i = 0;
 	for (Entity* entity : entities_)
 	{
-		grid.add_object(entity->position_.x, entity->position_.y, entity->id_);
+		const sf::Vector2f pos = entity->position_;
+		grid.add_object(pos.x, pos.y, entity->id_);
+
+		render.positions_x[i] = pos.x;
+		render.positions_y[i] = pos.y;
+		++i;
 	}
 }
 
@@ -78,5 +84,11 @@ void ParticleManager::resolve_collisions()
 
 void ParticleManager::fill_snapshot(SimSnapshot& snapshot)
 {
+	const int n = entities_.size();
 
+	snapshot.toggles = toggles;
+	snapshot.stats = stats;
+
+	std::memcpy(snapshot.render.positions_x.data(), render.positions_x.data(), n * sizeof(float));
+	std::memcpy(snapshot.render.positions_y.data(), render.positions_y.data(), n * sizeof(float));
 }

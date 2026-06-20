@@ -72,13 +72,26 @@ void Simulation::update()
 
 void Simulation::render()
 {
+    // Always grab the freshest completed simulation frame
+    const SimSnapshot& snap = m_sim_buffer_.begin_read();
+    float dt = static_cast<float>(m_delta_time_.get_delta());
+    //m_total_time_elapsed_ += dt;
+
+    if (snap.stats.iterations_ <= 1)
+        return;
+
     handle_events();       
     setCaption();
 
+    window.clear();
+
     particleManager.render_particles();
 
-    window.clear();
-    
+    handle_imGUI(snap, dt);
+
+    m_sim_buffer_.end_read();
+
+    ImGui::SFML::Render(window);
     window.display();
 }
 

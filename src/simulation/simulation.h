@@ -9,6 +9,7 @@
 #include "../utilities/random.h"
 #include "../utilities/camera.h"
 #include "../utilities/smooth_frame_rates.h"
+#include "../utilities/stopwatch.h"
 
 #include "particle_manager/particle_manager.h"
 
@@ -39,6 +40,8 @@ class Simulation : SimulationSettings
 	
 	FrameRateSmoothing<frame_smoothing_count> clock_{};
 	Camera camera{ &window, 1.f / scale_factor };
+
+	StopWatch m_delta_time_{};
 
 	// ── Triple-buffer (sim → render, lock-free) ───────────────────────────────
 	TripleBuffer<SimSnapshot> m_sim_buffer_{ ParticleSettings::particle_count };
