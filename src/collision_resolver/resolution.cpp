@@ -4,14 +4,15 @@
 
 thread_local FixedSpan<uint32_t> CollisionResolver::tl_nearby_ids{ nearby_ids_max };
 
-CollisionResolver::CollisionResolver(sf::RenderWindow* window, sf::Rect<float>* bounds, o_vector<Entity>* entities, 
-	unsigned int init_thread_count, unsigned int max_collisions_per_thread)
-	: window_(window), bounds_(bounds), entities_(entities), thread_count(init_thread_count),
+CollisionResolver::CollisionResolver(sf::Rect<float>* bounds, o_vector<Entity>* entities, 
+	unsigned int init_thread_count, unsigned int max_collisions_per_thread, unsigned int max_particles)
+	: 
+	entities_(entities), thread_count(init_thread_count),
 	grid(CellsX, CellsY, cell_max_capacity, bounds->size.x, bounds->size.y),
 	collision_thread_pool_( static_cast<int>(thread_count)),
 	add_to_grid_thread_pool_( static_cast<int>(thread_count))
 {
-    grid.prev_cells.reserve(max_collisions_per_thread);
+    grid.prev_cells.reserve(max_particles);
 
 	init_collision_jobs();
 	collision_indexes.resize(thread_count, CollisionVector(max_collisions_per_thread));

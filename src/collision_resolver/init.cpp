@@ -16,7 +16,6 @@ void CollisionResolver::init_collision_jobs()
 	const int chunk = std::max(1, (total_cells + (int)thread_count - 1) / (int)thread_count);
 
 	// Pre-build the Morton index list so threads just index into it
-	std::vector<uint32_t> morton_indices;
 	morton_indices.reserve(total_cells);
 	for (uint32_t cy = 0; cy < cells_y; ++cy)
 		for (uint32_t cx = 0; cx < cells_x; ++cx)
@@ -29,11 +28,10 @@ void CollisionResolver::init_collision_jobs()
 		if (begin >= total_cells) break;
 		const int end = std::min(begin + chunk, total_cells);
 
-		collision_jobs_.emplace_back([this, begin, end, t, morton_indices]
+		collision_jobs_.emplace_back([this, begin, end, t]
 			{
-				thread_local FixedSpan<uint32_t> local_nearby_ids = tl_nearby_ids;
 				for (int i = begin; i < end; ++i)
-					primitive_detect_collisions_for_grid_cell(morton_indices[i], local_nearby_ids, collision_indexes[t]);
+					primitive_detect_collisions_for_grid_cell(morton_indices[i], collision_indexes[t]);
 			});
 	}
 }

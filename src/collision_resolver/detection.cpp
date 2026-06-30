@@ -10,13 +10,13 @@ void CollisionResolver::run_collision_detection()
 	for (auto& collision_vector : collision_indexes)
 		collision_vector.clear();
 
-	collision_thread_pool_.run_and_wait(); // single pass, no colour loop
+	collision_thread_pool_.run_and_wait();
 }
 
 
-void CollisionResolver::primitive_detect_collisions_for_grid_cell(const int grid_cell_id, FixedSpan<uint32_t>& nearby_ids, CollisionVector& collision_vector)
+void CollisionResolver::primitive_detect_collisions_for_grid_cell(const int grid_cell_id, CollisionVector& collision_vector)
 {
-	grid.find_from_index(grid_cell_id, &nearby_ids);
+	grid.find_from_index(grid_cell_id, &tl_nearby_ids);
 
 	const uint8_t self_size = grid.cell_capacities[grid_cell_id];
 	const auto* self_contents = &grid.grid[grid_cell_id * grid.cell_max_capacity];
@@ -24,7 +24,7 @@ void CollisionResolver::primitive_detect_collisions_for_grid_cell(const int grid
 	for (uint8_t idx = 0; idx < self_size; ++idx)
 	{
 		const int pid = self_contents[idx];
-		update_protozoa_cell(pid, nearby_ids, collision_vector, -1);
+		update_protozoa_cell(pid, tl_nearby_ids, collision_vector, -1);
 	}
 }
 
@@ -117,7 +117,7 @@ void CollisionResolver::update_protozoa_cell(
 	const int protozoa_cell_index,
 	const FixedSpan<uint32_t>&nearby_ids,
 	CollisionVector & collision_vector,
-	int check_count = -1)  // -1 means check all
+	int check_count)  // -1 means check all
 {
 	const int limit = (check_count < 0) ? nearby_ids.count : check_count;
 
